@@ -18,8 +18,6 @@ contract IOracleFactory {
         address _oracle, 
         uint256 _bettingStartTime,
         uint256 _bettingEndTime,
-        uint256 _resultSettingStartTime,
-        uint256 _resultSettingEndTime,
         uint256 _consensusThreshold) 
         public returns (address);
 

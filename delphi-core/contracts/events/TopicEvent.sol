@@ -36,13 +36,14 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     Status public status = Status.Betting;
     bool public escrowWithdrawn;
     bytes32[10] public eventName;
-    bytes32[11] public eventResults;
+    bytes32[10] public eventResults;
     uint256 public totalQtumValue;
     uint256 public totalBotValue;
     uint256 public escrowAmount;
     IAddressManager private addressManager;
     Oracle[] public oracles;
     mapping(address => bool) public didWithdraw;
+    uint8 public numOfResults;
     bool public isDelphiOracle;
 
     // Events
@@ -86,8 +87,7 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         address _owner,
         address _bettingOracle,
         bytes32[10] _name,
-        bytes32[11] _resultNames,
-        uint8 _numOfResults,
+        bytes32[10] _resultNames,
         uint256 _bettingStartTime,
         uint256 _bettingEndTime,
         uint256 _resultSettingStartTime,
@@ -109,14 +109,26 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         version = _version;
         owner = _owner;
         eventName = _name;
-        eventResults = _resultNames;
-        numOfResults = _numOfResults;
+        //eventResults = _resultNames;
+        isDelphiOracle = _isDelphi;
         addressManager = IAddressManager(_addressManager);
         escrowAmount = addressManager.eventEscrowAmount();
 
+        //Calculate number of results; moved from EventFactory to decrease stack depth
+        eventResults[0] = "Invalid";
+        numOfResults++;
+
+        for (uint i = 0; i < _resultNames.length; i++) {
+            if (!_resultNames[i].isEmpty()) {
+                eventResults[i + 1] = _resultNames[i];
+                numOfResults++;
+            } else {
+                break;
+            }
+        }
+
         if(isDelphiOracle) {
-            createDelphiOracle(_bettingOracle, _bettingStartTime, _bettingEndTime, _resultSettingStartTime,
-                _resultSettingEndTime);
+            createDelphiOracle(_bettingOracle, _bettingStartTime, _bettingEndTime);
         } else {
             createCentralizedOracle(_bettingOracle, _bettingStartTime, _bettingEndTime, _resultSettingStartTime,
                  _resultSettingEndTime);
@@ -414,15 +426,12 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     function createDelphiOracle(
         address _delphiOracle, 
         uint256 _bettingStartTime,
-        uint256 _bettingEndTime,
-        uint256 _resultSettingStartTime,
-        uint256 _resultSettingEndTime)
+        uint256 _bettingEndTime)
         private
     {
         address oracleFactory = addressManager.oracleFactoryVersionToAddress(version);
         address newOracle = IOracleFactory(oracleFactory).createDelphiOracle(address(this), 
-            numOfResults, _delphiOracle, _bettingStartTime, _bettingEndTime, _resultSettingStartTime, 
-            _resultSettingEndTime, addressManager.startingOracleThreshold());
+            numOfResults, _delphiOracle, _bettingStartTime, _bettingEndTime, addressManager.startingOracleThreshold());
         
         assert(newOracle != address(0));
         oracles.push(Oracle({

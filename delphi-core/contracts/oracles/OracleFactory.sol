@@ -29,10 +29,6 @@ contract OracleFactory is IOracleFactory {
         address indexed _eventAddress, 
         uint8 _numOfResults,
         address _oracle,
-        uint256 _bettingStartTime,
-        uint256 _bettingEndTime,
-        uint256 _resultSettingStartTime,
-        uint256 _resultSettingEndTime,
         uint256 _consensusThreshold);
     event DecentralizedOracleCreated(
         uint16 indexed _version, 
@@ -87,23 +83,20 @@ contract OracleFactory is IOracleFactory {
         address _oracle,
         uint256 _bettingStartTime,
         uint256 _bettingEndTime,
-        uint256 _resultSettingStartTime,
-        uint256 _resultSettingEndTime,
         uint256 _consensusThreshold) 
         public
         returns (address)
     {
         bytes32 hash = getDelphiOracleHash(_eventAddress, _numOfResults, _oracle, _bettingStartTime, 
-            _bettingEndTime, _resultSettingStartTime, _resultSettingEndTime, _consensusThreshold);
+            _bettingEndTime, _consensusThreshold);
         // DelphiOracle should not exist yet
         require(oracles[hash] == address(0));
 
         DelphiOracle dOracle = new DelphiOracle(version, msg.sender, _eventAddress, _numOfResults, _oracle, 
-            _bettingStartTime, _bettingEndTime, _resultSettingStartTime, _resultSettingEndTime, _consensusThreshold);
+            _bettingStartTime, _bettingEndTime, _consensusThreshold);
         oracles[hash] = address(dOracle);
 
-        emit DelphiOracleCreated(version, address(dOracle), _eventAddress, _numOfResults, _oracle, _bettingStartTime, 
-            _bettingEndTime, _resultSettingStartTime, _resultSettingEndTime, _consensusThreshold);
+        emit DelphiOracleCreated(version, address(dOracle), _eventAddress, _numOfResults, _oracle, _consensusThreshold);
 
         return address(dOracle);
     }
@@ -155,15 +148,13 @@ contract OracleFactory is IOracleFactory {
         address _oracle,
         uint256 _bettingStartTime,
         uint256 _bettingEndTime,
-        uint256 _resultSettingStartTime,
-        uint256 _resultSettingEndTime,
         uint256 _consensusThreshold) 
         private
         pure
         returns (bytes32)
     {
         return keccak256(abi.encodePacked(_eventAddress, _numOfResults, _oracle, _bettingStartTime, _bettingEndTime, 
-            _resultSettingStartTime, _resultSettingEndTime, _consensusThreshold));
+            _consensusThreshold));
     }
 
     function getDecentralizedOracleHash(

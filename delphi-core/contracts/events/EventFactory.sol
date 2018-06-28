@@ -18,8 +18,7 @@ contract EventFactory {
         address indexed _topicAddress, 
         address indexed _creatorAddress,
         bytes32[10] _name, 
-        bytes32[11] _resultNames,
-        uint8 _numOfResults,
+        bytes32[10] _resultNames,
         uint256 _escrowAmount);
 
     constructor(address _addressManager) public {
@@ -44,37 +43,27 @@ contract EventFactory {
         require(!_name[0].isEmpty());
         require(!_resultNames[0].isEmpty());
         require(!_resultNames[1].isEmpty());
-        
-        bytes32[11] memory resultNames;
-        uint8 numOfResults;
 
-        resultNames[0] = "Invalid";
-        numOfResults++;
-
-        for (uint i = 0; i < _resultNames.length; i++) {
-            if (!_resultNames[i].isEmpty()) {
-                resultNames[i + 1] = _resultNames[i];
-                numOfResults++;
-            } else {
-                break;
-            }
-        }
-
-        bytes32 topicHash = getTopicHash(_name, resultNames, numOfResults, _bettingStartTime, _bettingEndTime, 
+        bytes32 topicHash = getTopicHash(_name, _resultNames, _bettingStartTime, _bettingEndTime, 
             _resultSettingStartTime, _resultSettingEndTime);
 
         require(address(topics[topicHash]) == 0);
 
         IAddressManager(addressManager).transferEscrow(msg.sender);
 
-        TopicEvent topic = new TopicEvent(version, msg.sender, _oracle, _name, resultNames, numOfResults, 
+        //Could not pass _isDelphi directly to TopicEvent:
+        //  Error: CompilerError: Stack too deep, try removing local variables.
+        //  Solution: moved numOfResult calculation to TopicEvent.sol to decrease # of parameters being passed and
+        //      decreased _resultNames to bytes[10].
+
+        TopicEvent topic = new TopicEvent(version, msg.sender, _oracle, _name, _resultNames, 
             _bettingStartTime, _bettingEndTime, _resultSettingStartTime, _resultSettingEndTime, addressManager, _isDelphi);
 
         topics[topicHash] = topic;
 
         IAddressManager(addressManager).addWhitelistContract(address(topic));
 
-        emit TopicCreated(version, address(topic), msg.sender, _name, resultNames, numOfResults,
+        emit TopicCreated(version, address(topic), msg.sender, _name, _resultNames,
             IAddressManager(addressManager).eventEscrowAmount());
 
         return topic;
@@ -82,8 +71,7 @@ contract EventFactory {
 
     function getTopicHash(
         bytes32[10] _name, 
-        bytes32[11] _resultNames, 
-        uint8 _numOfResults,
+        bytes32[10] _resultNames,
         uint256 _bettingStartTime,
         uint256 _bettingEndTime,
         uint256 _resultSettingStartTime,
@@ -92,7 +80,7 @@ contract EventFactory {
         pure    
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(_name, _resultNames, _numOfResults, _bettingStartTime, _bettingEndTime, 
+        return keccak256(abi.encodePacked(_name, _resultNames, _bettingStartTime, _bettingEndTime, 
             _resultSettingStartTime, _resultSettingEndTime));
     }
 }
