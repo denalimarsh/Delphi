@@ -16,10 +16,10 @@ This process could be facilitated by third-party tools such as Oraclize, a tool 
 
 The diagram below shows the smart contract structure of the Bodhi Prediction Network with Delphi Oracle integration. At the bottom, a prediction event's controlling oracles (DelphiOracle, CentralizedOracle, or DecentralizedOracle) are seen overlaid on the event's timeline, denoting which smart contract is facilitating the result setting/voting process at any given point during the event's lifespan.
 
-![Bodhi Prediction Network + Delphi Oracle smart contracts](/DelphiOracleContractStructure.png)
-
 - Yellow: new contracts
 - Light yellow: pre-existing contracts modified to support Delphi Oracle integration.
 - Blue: unmodified contracts
+
+![Bodhi Prediction Network + Delphi Oracle smart contracts](/DelphiOracleContractStructure.png)
 
 While the proposed smart contracts were integrated with the Bodhi Prediction Network, they were not brought to full functionality due to the rigid time constraints of the hackathon. Bodhi has expressed interest in continuing development on the concepts proposed by the Delphi Oracle project.
