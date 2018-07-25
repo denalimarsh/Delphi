@@ -12,11 +12,11 @@ The goal of our project was to allow a smart contract to act as the Oracle at th
 
 This process could be facilitated by third-party tools such as Oraclize, a tool designed to enable data-rich smart contracts - but currently, Oraclize's service is only on the ethereum blockchain. If tools such as Oraclize do not become available on QTUM in the near future, Bodhi's smart contracts would still be able to use this service immediately following the planned ethereum cross-chain integration.
 
-### Project Arcitecture
+### Smart Contract Arcitecture
 
 The diagram below shows the smart contract structure of the Bodhi Prediction Network with Delphi Oracle integration. At the bottom, a prediction event's controlling oracles (DelphiOracle, CentralizedOracle, or DecentralizedOracle) are seen overlaid on the event's timeline, denoting which smart contract is facilitating the result setting/voting process at any given point during the event's lifespan.
 
-![alt text](/DelphiOracleContracts.pdf)
+![Bodhi Prediction Network + Delphi Oracle smart contracts](/DelphiOracleContractStructure.png)
 
 - Yellow: new contracts
 - Light yellow: pre-existing contracts modified to support Delphi Oracle integration.
